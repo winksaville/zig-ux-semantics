@@ -203,3 +203,31 @@ test "address.u1" {
     assert(val == 1);
     assert(pVal.* == 1);
 }
+
+fn S1field(comptime T1: type) type {
+    return struct {
+        f1: T1,
+    };
+}
+
+test "struct.S1field.u8" {
+    const S1f = S1field(u8);
+    var s1f = S1f { .f1 = 0,};
+    assert(s1f.f1 == 0);
+    assert(@sizeOf(S1f) == 1);
+    assert(@offsetOf(S1f, "f1") == 0);
+}
+
+/// Compile fails
+///
+/// $ zig test ux-semantics.zig 
+/// /home/wink/prgs/ziglang/zig-ux-semantics/ux-semantics.zig:226:27: error: zero-bit field 'f1' in struct 'S1field(u0)' has no offset
+///     assert(@offsetOf(S1f, "f1") == 0); // error: zero-bit field ...
+///                           ^
+//test "struct.S1field.u0" {
+//    const S1f = S1field(u0);
+//    var s1f = S1f { .f1 = 0,};
+//    assert(s1f.f1 == 0);
+//    assert(@sizeOf(S1f) == 0);
+//    assert(@offsetOf(S1f, "f1") == 0); // error: zero-bit field ...
+//}
