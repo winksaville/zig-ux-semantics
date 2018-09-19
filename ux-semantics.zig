@@ -23,40 +23,124 @@ const TypeId = builtin.TypeId;
 //    }
 //}
 
-/// Compiles but test fails:
-/// $ zig test --test-filter undefined.u1 ux-symantics.zig 
-/// Test 1/1 undefined.u1...assertion failure
+/// Compiles but fails test with a debug build, works with fast|small|safe builds
+///
+/// $ zig test ux-semantics.zig 
+/// Test 1/12 undefined.u1.truncate...assertion failure
 /// /home/wink/opt/lib/zig/std/debug/index.zig:118:13: 0x205029 in ??? (test)
 ///             @panic("assertion failure");
 ///             ^
-/// /home/wink/prgs/ziglang/zig-u0-tests/ux-symantics.zig:31:20: 0x20507d in ??? (test)
-///         1 => assert(one == 1),
+/// /home/wink/prgs/ziglang/zig-ux-semantics/ux-semantics.zig:59:20: 0x20507d in ??? (test)
+///         1 => assert(val == 1),
 ///                    ^
-/// /home/wink/opt/lib/zig/std/special/test_runner.zig:13:25: 0x22304a in ??? (test)
+/// /home/wink/opt/lib/zig/std/special/test_runner.zig:13:25: 0x22330a in ??? (test)
 ///         if (test_fn.func()) |_| {
 ///                         ^
-/// /home/wink/opt/lib/zig/std/special/bootstrap.zig:96:22: 0x222dfb in ??? (test)
+/// /home/wink/opt/lib/zig/std/special/bootstrap.zig:96:22: 0x2230bb in ??? (test)
 ///             root.main() catch |err| {
 ///                      ^
-/// /home/wink/opt/lib/zig/std/special/bootstrap.zig:70:20: 0x222d75 in ??? (test)
+/// /home/wink/opt/lib/zig/std/special/bootstrap.zig:70:20: 0x223035 in ??? (test)
 ///     return callMain();
 ///                    ^
-/// /home/wink/opt/lib/zig/std/special/bootstrap.zig:64:39: 0x222bd8 in ??? (test)
+/// /home/wink/opt/lib/zig/std/special/bootstrap.zig:64:39: 0x222e98 in ??? (test)
 ///     std.os.posix.exit(callMainWithArgs(argc, argv, envp));
 ///                                       ^
-/// /home/wink/opt/lib/zig/std/special/bootstrap.zig:37:5: 0x222a90 in ??? (test)
+/// /home/wink/opt/lib/zig/std/special/bootstrap.zig:37:5: 0x222d50 in ??? (test)
 ///     @noInlineCall(posixCallMainAndExit);
 ///     ^
 /// 
 /// Tests failed. Use the following command to reproduce the failure:
-/// /home/wink/prgs/ziglang/zig-u0-tests/zig-cache/test
-//test "undefined.u1" {
+/// /home/wink/prgs/ziglang/zig-ux-semantics/zig-cache/test
+//test "undefined.u1.truncate" {
 //    var val: u1 = undefined;
+//    val = @truncate(u1, val);
 //    switch (val) {
 //        0 => assert(val == 0),
 //        1 => assert(val == 1),
 //    }
 //}
+
+/// Compiles but fails test with a debug build, works with fast|small|safe builds
+///
+/// $ zig test ux-semantics.zig 
+/// Test 1/10 undefined.u1.truncate.assert.truncate...assertion failure
+/// /home/wink/opt/lib/zig/std/debug/index.zig:96:13: 0x205029 in ??? (test)
+///             @panic("assertion failure");
+///             ^
+/// /home/wink/prgs/ziglang/zig-ux-semantics/ux-semantics.zig:96:20: 0x20507d in ??? (test)
+///         1 => assert(@truncate(u1, val) == 1),
+///                    ^
+/// /home/wink/opt/lib/zig/std/special/test_runner.zig:13:25: 0x22324a in ??? (test)
+///         if (test_fn.func()) |_| {
+///                         ^
+/// /home/wink/opt/lib/zig/std/special/bootstrap.zig:96:22: 0x222ffb in ??? (test)
+///             root.main() catch |err| {
+///                      ^
+/// /home/wink/opt/lib/zig/std/special/bootstrap.zig:70:20: 0x222f75 in ??? (test)
+///     return callMain();
+///                    ^
+/// /home/wink/opt/lib/zig/std/special/bootstrap.zig:64:39: 0x222dd8 in ??? (test)
+///     std.os.posix.exit(callMainWithArgs(argc, argv, envp));
+///                                       ^
+/// /home/wink/opt/lib/zig/std/special/bootstrap.zig:37:5: 0x222c90 in ??? (test)
+///     @noInlineCall(posixCallMainAndExit);
+///     ^
+/// 
+/// Tests failed. Use the following command to reproduce the failure:
+/// /home/wink/prgs/ziglang/zig-ux-semantics/zig-cache/test
+//test "undefined.u1.truncate.assert.truncate" {
+//    var val: u1 = undefined;
+//    val = @truncate(u1, val);
+//    switch (val) {
+//        0 => assert(val == 0),
+//        1 => assert(@truncate(u1, val) == 1),
+//    }
+//}
+
+/// Compiles but fails test with a debug build, works with fast|small|safe builds
+///
+/// $ zig test ux-semantics.zig 
+/// Test 1/11 undefined.u1.bitmask...assertion failure
+/// /home/wink/opt/lib/zig/std/debug/index.zig:133:13: 0x205029 in ??? (test)
+///             @panic("assertion failure");
+///             ^
+/// /home/wink/prgs/ziglang/zig-ux-semantics/ux-semantics.zig:133:20: 0x20507d in ??? (test)
+///         1 => assert(val == 1),
+///                    ^
+/// /home/wink/opt/lib/zig/std/special/test_runner.zig:13:25: 0x2232aa in ??? (test)
+///         if (test_fn.func()) |_| {
+///                         ^
+/// /home/wink/opt/lib/zig/std/special/bootstrap.zig:96:22: 0x22305b in ??? (test)
+///             root.main() catch |err| {
+///                      ^
+/// /home/wink/opt/lib/zig/std/special/bootstrap.zig:70:20: 0x222fd5 in ??? (test)
+///     return callMain();
+///                    ^
+/// /home/wink/opt/lib/zig/std/special/bootstrap.zig:64:39: 0x222e38 in ??? (test)
+///     std.os.posix.exit(callMainWithArgs(argc, argv, envp));
+///                                       ^
+/// /home/wink/opt/lib/zig/std/special/bootstrap.zig:37:5: 0x222cf0 in ??? (test)
+///     @noInlineCall(posixCallMainAndExit);
+///     ^
+/// 
+/// Tests failed. Use the following command to reproduce the failure:
+/// /home/wink/prgs/ziglang/zig-ux-semantics/zig-cache/test
+//test "undefined.u1.bitmask" {
+//    var val: u1 = undefined;
+//    val &= 1;
+//    switch (val) {
+//        0 => assert(val == 0),
+//        1 => assert(val == 1),
+//    }
+//}
+
+test "undefined.u1.assert.truncate" {
+    var val: u1 = undefined;
+    switch (val) {
+        0 => assert(val == 0),
+        else => assert(@truncate(u1, val) == 1),
+    }
+}
 
 test "assignment.u0" {
     var val: u0 = 0;
