@@ -151,7 +151,7 @@ test "struct.S1field.u8" {
     assert(@offsetOf(S1f, "f1") == 0);
 }
 
-/// Compile fails
+/// Compile fails, see https://github.com/ziglang/zig/issues/1564
 ///
 /// $ zig test ux-semantics.zig 
 /// /home/wink/prgs/ziglang/zig-ux-semantics/ux-semantics.zig:226:27: error: zero-bit field 'f1' in struct 'S1field(u0)' has no offset
@@ -163,4 +163,37 @@ test "struct.S1field.u8" {
 //    assert(s1f.f1 == 0);
 //    assert(@sizeOf(S1f) == 0);
 //    assert(@offsetOf(S1f, "f1") == 0); // error: zero-bit field ...
+//}
+
+fn displayF1ValOffsetAddr(s1: var) void {
+    warn("s1.f1={} offset(s1.f1)={} &s1.f1={*}\n",
+        s1.f1, @intCast(usize, @offsetOf(@typeOf(s1), "f1")), &s1.f1);
+}
+
+test "displayF1ValOffsetAddr.u1" {
+    warn("\n");
+    const S1f = S1field(u1);
+    var s1f = S1f { .f1 = 0,};
+    displayF1ValOffsetAddr(s1f);
+}
+
+test "displayF1ValOffsetAddr.i128" {
+    warn("\n");
+    const S1f = S1field(i128);
+    var s1f = S1f { .f1 = 0,};
+    displayF1ValOffsetAddr(s1f);
+}
+
+/// Compile fails, same error as test "struct.S1field.u0"
+///
+/// /home/wink/prgs/ziglang/zig-ux-semantics/ux-semantics.zig:170:55: error: zero-bit field 'f1' in struct 'S1field(u0)' has no offset
+///         s1.f1, @intCast(usize, @offsetOf(@typeOf(s1), "f1")), &s1.f1);
+///                                                       ^
+/// /home/wink/prgs/ziglang/zig-ux-semantics/ux-semantics.zig:198:27: note: called from here
+///     displayF1ValOffsetAddr(s1f);
+///                           ^
+//test "displayF1ValOffsetAddr.u0" {
+//    const S1f = S1field(u0);
+//    var s1f = S1f { .f1 = 0,};
+//    displayF1ValOffsetAddr(s1f);
 //}
