@@ -5,6 +5,8 @@ const assert = std.debug.assert;
 const warn = std.debug.warn;
 const builtin = @import("builtin");
 const TypeId = builtin.TypeId;
+const Timer = std.os.time.Timer;
+const DefaultPrng = std.rand.DefaultPrng;
 
 /// Compiler Seg faults:
 /// #0  0x00007f4479d32bf0 in llvm::Value::getContext() const () from /usr/lib/libLLVM-6.0.so
@@ -23,122 +25,53 @@ const TypeId = builtin.TypeId;
 //    }
 //}
 
-/// Compiles but fails test with a debug build, works with fast|small|safe builds
-///
+var once: bool = false;
+var prng: DefaultPrng = undefined;
+
+fn seed() u64 {
+    var timer = Timer.start() catch return 123;
+    return timer.read();
+}
+
+fn rand() u64 {
+    if (!once) {
+        once = true;
+        prng = DefaultPrng.init(seed());
+    }
+    return prng.random.scalar(u64);
+}
+
 /// $ zig test ux-semantics.zig 
-/// Test 1/12 undefined.u1.truncate...assertion failure
-/// /home/wink/opt/lib/zig/std/debug/index.zig:118:13: 0x205029 in ??? (test)
-///             @panic("assertion failure");
-///             ^
-/// /home/wink/prgs/ziglang/zig-ux-semantics/ux-semantics.zig:59:20: 0x20507d in ??? (test)
-///         1 => assert(val == 1),
-///                    ^
-/// /home/wink/opt/lib/zig/std/special/test_runner.zig:13:25: 0x22330a in ??? (test)
-///         if (test_fn.func()) |_| {
-///                         ^
-/// /home/wink/opt/lib/zig/std/special/bootstrap.zig:96:22: 0x2230bb in ??? (test)
-///             root.main() catch |err| {
-///                      ^
-/// /home/wink/opt/lib/zig/std/special/bootstrap.zig:70:20: 0x223035 in ??? (test)
-///     return callMain();
-///                    ^
-/// /home/wink/opt/lib/zig/std/special/bootstrap.zig:64:39: 0x222e98 in ??? (test)
-///     std.os.posix.exit(callMainWithArgs(argc, argv, envp));
-///                                       ^
-/// /home/wink/opt/lib/zig/std/special/bootstrap.zig:37:5: 0x222d50 in ??? (test)
-///     @noInlineCall(posixCallMainAndExit);
-///     ^
-/// 
-/// Tests failed. Use the following command to reproduce the failure:
-/// /home/wink/prgs/ziglang/zig-ux-semantics/zig-cache/test
-//test "undefined.u1.truncate" {
-//    var val: u1 = undefined;
-//    val = @truncate(u1, val);
-//    switch (val) {
-//        0 => assert(val == 0),
-//        1 => assert(val == 1),
+/// Trunc only produces integer
+///   trunc i64 %3 to void, !dbg !780
+/// LLVM ERROR: Broken module found, compilation aborted!
+//test "undefined.u0.truncate.u0.rand.FAILS" {
+//    var i: u8 = 32;
+//    while (i > 0) : (i -= 1) {
+//        var val: u0 = undefined;
+//        val = @truncate(u0, rand());
+//        assert(val == 0);
 //    }
 //}
 
-/// Compiles but fails test with a debug build, works with fast|small|safe builds
-///
-/// $ zig test ux-semantics.zig 
-/// Test 1/10 undefined.u1.truncate.assert.truncate...assertion failure
-/// /home/wink/opt/lib/zig/std/debug/index.zig:96:13: 0x205029 in ??? (test)
-///             @panic("assertion failure");
-///             ^
-/// /home/wink/prgs/ziglang/zig-ux-semantics/ux-semantics.zig:96:20: 0x20507d in ??? (test)
-///         1 => assert(@truncate(u1, val) == 1),
-///                    ^
-/// /home/wink/opt/lib/zig/std/special/test_runner.zig:13:25: 0x22324a in ??? (test)
-///         if (test_fn.func()) |_| {
-///                         ^
-/// /home/wink/opt/lib/zig/std/special/bootstrap.zig:96:22: 0x222ffb in ??? (test)
-///             root.main() catch |err| {
-///                      ^
-/// /home/wink/opt/lib/zig/std/special/bootstrap.zig:70:20: 0x222f75 in ??? (test)
-///     return callMain();
-///                    ^
-/// /home/wink/opt/lib/zig/std/special/bootstrap.zig:64:39: 0x222dd8 in ??? (test)
-///     std.os.posix.exit(callMainWithArgs(argc, argv, envp));
-///                                       ^
-/// /home/wink/opt/lib/zig/std/special/bootstrap.zig:37:5: 0x222c90 in ??? (test)
-///     @noInlineCall(posixCallMainAndExit);
-///     ^
-/// 
-/// Tests failed. Use the following command to reproduce the failure:
-/// /home/wink/prgs/ziglang/zig-ux-semantics/zig-cache/test
-//test "undefined.u1.truncate.assert.truncate" {
-//    var val: u1 = undefined;
-//    val = @truncate(u1, val);
-//    switch (val) {
-//        0 => assert(val == 0),
-//        1 => assert(@truncate(u1, val) == 1),
-//    }
-//}
+test "undefined.u0.truncate.u0.literal.OK" {
+    var i: u8 = 32;
+    while (i > 0) : (i -= 1) {
+        var val: u0 = undefined;
+        val = @truncate(u0, 123);
+        assert(val == 0);
+    }
+}
 
-/// Compiles but fails test with a debug build, works with fast|small|safe builds
-///
-/// $ zig test ux-semantics.zig 
-/// Test 1/11 undefined.u1.bitmask...assertion failure
-/// /home/wink/opt/lib/zig/std/debug/index.zig:133:13: 0x205029 in ??? (test)
-///             @panic("assertion failure");
-///             ^
-/// /home/wink/prgs/ziglang/zig-ux-semantics/ux-semantics.zig:133:20: 0x20507d in ??? (test)
-///         1 => assert(val == 1),
-///                    ^
-/// /home/wink/opt/lib/zig/std/special/test_runner.zig:13:25: 0x2232aa in ??? (test)
-///         if (test_fn.func()) |_| {
-///                         ^
-/// /home/wink/opt/lib/zig/std/special/bootstrap.zig:96:22: 0x22305b in ??? (test)
-///             root.main() catch |err| {
-///                      ^
-/// /home/wink/opt/lib/zig/std/special/bootstrap.zig:70:20: 0x222fd5 in ??? (test)
-///     return callMain();
-///                    ^
-/// /home/wink/opt/lib/zig/std/special/bootstrap.zig:64:39: 0x222e38 in ??? (test)
-///     std.os.posix.exit(callMainWithArgs(argc, argv, envp));
-///                                       ^
-/// /home/wink/opt/lib/zig/std/special/bootstrap.zig:37:5: 0x222cf0 in ??? (test)
-///     @noInlineCall(posixCallMainAndExit);
-///     ^
-/// 
-/// Tests failed. Use the following command to reproduce the failure:
-/// /home/wink/prgs/ziglang/zig-ux-semantics/zig-cache/test
-//test "undefined.u1.bitmask" {
-//    var val: u1 = undefined;
-//    val &= 1;
-//    switch (val) {
-//        0 => assert(val == 0),
-//        1 => assert(val == 1),
-//    }
-//}
-
-test "undefined.u1.assert.truncate" {
-    var val: u1 = undefined;
-    switch (val) {
-        0 => assert(val == 0),
-        else => assert(@truncate(u1, val) == 1),
+test "undefined.u1" {
+    var i: u8 = 32;
+    while (i > 0) : (i -= 1) {
+        var val: u1 = undefined;
+        val = @truncate(u1, rand());
+        switch (val) {
+            0 => assert(val == 0),
+            1 => assert(val == 1),
+        }
     }
 }
 
